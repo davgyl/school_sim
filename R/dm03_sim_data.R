@@ -1,7 +1,6 @@
 
 source("R/dm02_pkg.R")
 
-
 # README ------------------------------------------------------------------
 
 # pid = id-number. In simulation those dg1 start with 1,
@@ -15,8 +14,87 @@ source("R/dm02_pkg.R")
 
 # event_dg1 ... event_dg3 = event for dg1 ... dg3
 
-# Do first data for dg1, dg2 and dg3 and fainlly for those without diagnoses
+# Check which way is better:
+# 1) Simulate total data and add survival outcomes
+# 2) Do first data for dg1, dg2 and dg3 and finally for those without diagnoses
+# -> decide on which and delete unnecessary code
 
+# Simulate total data and add survival outcomes ---------------------------
+
+n <- 60000
+
+par1 <- 2.5 
+par2 <- 2.8 
+par3 <- 2.3 
+par4 <- 2.5 
+par5 <- 2.5 
+par6 <- 2.5 
+
+set.seed(100)
+
+df_tot <-
+  
+  bind_cols(
+    
+    # simulate grades of specific subjects
+    simstudy::genCorGen(
+      n,
+      nvars = 6,
+      params1 = c(par1, par2, par3, par4, par5, par6),
+      dist = "poisson",
+      rho = 0.5,
+      corstr = "cs",
+      wide = TRUE,
+      cnames = paste0("subject_", 1:6)
+    ),
+    
+    # simulate covariates
+    simstudy::genCorGen(
+      n,
+      nvars = 6,
+      params1 = seq(0.03, 0.45, length.out = 6), 
+      dist = "binary",
+      rho = 0.2,
+      corstr = "cs",
+      wide = TRUE,
+      cnames = paste0("covar_", 1:6)
+    ) %>%
+      select(-id)
+    
+  ) %>%
+  as_tibble() %>%
+  mutate(
+    
+    # pid
+    pid = id + 1e6,  
+    
+    # start of follow-up
+    d_start = as.Date("2003-05-31")
+    
+    # time to dg and event of dg
+    # time_dg1 = d_start + runif(n, 11.5*365.25, 12.5*365.25), # between 11.5and 12.5 years
+    # event_dg1 = 0 %>% rep(n), # none
+    # 
+    # time_dg2 = d_start + runif(n, 11.5*365.25, 12.5*365.25),
+    # event_dg2 = 0 %>% rep(n),
+    # 
+    # time_dg3 = d_start + runif(n, 11.5*365.25, 12.5*365.25),
+    # event_dg3 = 0 %>% rep(n)
+    
+  )
+
+betas <- 
+  log(xxxxxxx)*x[,  "subject_1"] + 
+  log(xxxxxxx)*x[,  "subject_2"] + 
+  log(xxxxxxx)*x[,  "subject_3"] + 
+  log(xxxxxxx)*x[,  "subject_3"]^2 + 
+  log(xxxxxxx)*x[,  "subject_3"]^3 + 
+  log(xxxxxxx)*x[,  "covar_1"] + 
+  log(xxxxxxx)*x[,  "covar_2"] + 
+  log(xxxxxxx)*x[,  "covar_3"] 
+
+# CONTINUE HERE AND PROGRAM time_dg1, event_dg1 etc.
+  
 # Simulate data for dg1 ---------------------------------------------------
 
 n <- 600
