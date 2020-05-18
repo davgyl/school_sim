@@ -15,6 +15,7 @@ source("R/dm02_pkg.r")
 model_fits <- model_fits_nonscaled
 
 # If simulated data
+# NOTE: not resembling real data although same variable names
 source("R/dm03_sim_data.R")
 fbc <- df_all
 

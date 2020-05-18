@@ -8,8 +8,9 @@ source("R/dm02_pkg.r")
 
 # Read data ---------------------------------------------------------------
 
-# If simulated data
-source("R/dm03_sim_data.R")
+# If simulated data 
+# NOTE: not resembling real data although same variable names
+source("R/dm03_sim_data.R") 
 fbc <- df_all
 
 # Mutate data -------------------------------------------------------------

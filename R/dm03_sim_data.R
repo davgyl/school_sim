@@ -14,10 +14,7 @@ source("R/dm02_pkg.R")
 
 # event_dg1 ... event_dg3 = event for dg1 ... dg3
 
-# Check which way is better:
-# 1) Simulate total data and add survival outcomes
-# 2) Do first data for dg1, dg2 and dg3 and finally for those without diagnoses
-# -> decide on which and delete unnecessary code
+# NOTE: Rename variables to same in real data although the cumulative incidence and associations are different from the real data.
 
 # Simulate total data and add survival outcomes ---------------------------
 
@@ -70,288 +67,99 @@ df_tot <-
     
     # start of follow-up
     d_start = as.Date("2003-05-31")
-    
-    # time to dg and event of dg
-    # time_dg1 = d_start + runif(n, 11.5*365.25, 12.5*365.25), # between 11.5and 12.5 years
-    # event_dg1 = 0 %>% rep(n), # none
-    # 
-    # time_dg2 = d_start + runif(n, 11.5*365.25, 12.5*365.25),
-    # event_dg2 = 0 %>% rep(n),
-    # 
-    # time_dg3 = d_start + runif(n, 11.5*365.25, 12.5*365.25),
-    # event_dg3 = 0 %>% rep(n)
-    
-  )
-
-betas <- 
-  log(xxxxxxx)*x[,  "subject_1"] + 
-  log(xxxxxxx)*x[,  "subject_2"] + 
-  log(xxxxxxx)*x[,  "subject_3"] + 
-  log(xxxxxxx)*x[,  "subject_3"]^2 + 
-  log(xxxxxxx)*x[,  "subject_3"]^3 + 
-  log(xxxxxxx)*x[,  "covar_1"] + 
-  log(xxxxxxx)*x[,  "covar_2"] + 
-  log(xxxxxxx)*x[,  "covar_3"] 
-
-# CONTINUE HERE AND PROGRAM time_dg1, event_dg1 etc.
   
-# Simulate data for dg1 ---------------------------------------------------
-
-n <- 600
-
-par1 <- 2.5 # As all other
-par2 <- 2.8 # As all other
-par3 <- 2.7 # Unique (low grades over-represented)
-par4 <- 2.5 # As all other
-par5 <- 2.4 # As all other diagnoses (high grades over-represented)
-par6 <- 2.5 # As all other
-
-set.seed(100)
-
-df_dg1 <-
-
-  bind_cols(
-
-    # simulate grades of specific subjects
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = c(par1, par2, par3, par4, par5, par6),
-      dist = "poisson",
-      rho = 0.5,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("subject_", 1:6)
-    ),
-
-    # simulate covariates
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = seq(0.07, 0.5, length.out = 6),
-      dist = "binary",
-      rho = 0.2,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("covar_", 1:6)
-    ) %>%
-      select(-id)
-
-  ) %>%
-  as_tibble() %>%
-  mutate(
-
-    # pid
-    pid = id + 1e6,  # mark to start with 1
-
-    # start of follow-up
-    d_start = as.Date("2003-05-31"),
-
-    # time to dg and event of dg
-    time_dg1 = d_start + runif(n, 0, 12.5*365.25), # between 0 and 12.5 years
-    event_dg1 = 1 %>% rep(n) # event == 1
-
   )
 
-# Simulate data for dg2 ---------------------------------------------------
+# Utlize and modify function in example of cox.ph {mgcv}
+ph.weibull.sim <- function(eta, gamma=0.5, h0=1e-3, t1=12.5*365.25) { 
+  lambda <- h0*exp(eta)
+  n <- length(eta)
+  U <- runif(n)
+  t <- (-log(U)/lambda)^(1/gamma)
+  d <- as.numeric(t <= t1)
+  t[!d] <- t1
+  list(t=t,d=d)
+}
 
-n <- 400
+# dg1
+f0 <- function(x) -0.5*x
+f1 <- function(x) -0.5*x
+f2 <- function(x) -0.3*x + 0.03*x^3
+f3 <- function(x) 0.6*x
+f4 <- function(x) 0.3*x
+f <- 
+  f0(df_tot$subject_1) + 
+  f1(df_tot$subject_2) + 
+  f2(df_tot$subject_3) +
+  f3(df_tot$covar_1) + 
+  f4(df_tot$covar_2) 
+  
+g <- (f-mean(f))/5
+ssurv_1 <- ph.weibull.sim(g)
+# ssurv_1 %>% as_tibble() %>% mutate(t = round(t, 1))
+# ssurv_1 %>% as_tibble() %>% count(d)
 
-par1 <- 2.5 # As all other
-par2 <- 2.8 # As all other
-par3 <- 2.6 # As for dg3 (low grades over-represented but not as low for dg1)
-par4 <- 2.5 # As all other
-par5 <- 2.4 # As all other diagnoses (high grades over-represented)
-par6 <- 2.5 # As all other
+# dg2
+f0 <- function(x) -0.4*x
+f1 <- function(x) -0.4*x
+f2 <- function(x) -0.3*x + 0.02*x^3
+f3 <- function(x) 0.5*x
+f4 <- function(x) 0.3*x
+f <- 
+  f0(df_tot$subject_1) + 
+  f1(df_tot$subject_2) + 
+  f2(df_tot$subject_3) +
+  f3(df_tot$covar_1) + 
+  f4(df_tot$covar_2) 
 
-set.seed(100)
+g <- (f-mean(f))/5
+ssurv_2 <- ph.weibull.sim(g)
+# ssurv_2 %>% as_tibble() %>% count(d)
 
-df_dg2 <-
+# dg3
+f0 <- function(x) -0.4*x
+f1 <- function(x) -0.4*x
+f2 <- function(x) -0.2*x + 0.01*x^3
+f3 <- function(x) 0.4*x
+f4 <- function(x) 0.3*x
+f <- 
+  f0(df_tot$subject_1) + 
+  f1(df_tot$subject_2) + 
+  f2(df_tot$subject_3) +
+  f3(df_tot$covar_1) + 
+  f4(df_tot$covar_2) 
 
+g <- (f-mean(f))/5
+ssurv_3 <- ph.weibull.sim(g)
+# ssurv_3 %>% as_tibble() %>% count(d)
+
+df_all <- 
   bind_cols(
-
-    # simulate grades of specific subjects
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = c(par1, par2, par3, par4, par5, par6),
-      dist = "poisson",
-      rho = 0.5,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("subject_", 1:6)
-    ),
-
-    # simulate covariates
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = seq(0.07, 0.5, length.out = 6), # less common than among dg1
-      dist = "binary",
-      rho = 0.2,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("covar_", 1:6)
-    ) %>%
-      select(-id)
-
-  ) %>%
-  as_tibble() %>%
+    df_tot, 
+    ssurv_1 %>% 
+      as_tibble() %>% 
+      rename(
+        time_dg1 = t, 
+        event_dg1 = d
+      ), 
+    ssurv_2 %>% 
+      as_tibble() %>% 
+      rename(
+        time_dg2 = t, 
+        event_dg2 = d
+      ), 
+    ssurv_3 %>% 
+      as_tibble() %>% 
+      rename(
+        time_dg3 = t, 
+        event_dg3 = d
+      )
+  ) %>% 
   mutate(
-
-    # pid
-    pid = id + 2e6,  # mark to start with 2
-
-    # start of follow-up
-    d_start = as.Date("2003-05-31"),
-
-    # time to dg and event of dg
-
-    time_dg2 = d_start + runif(n, 0, 12.5*365.25), # between 0 and 12.5 years
-    event_dg2 = 1 %>% rep(n) # event == 1
-
-  )
-
-
-# Simulate data for dg3 ---------------------------------------------------
-
-n <- 2500
-
-par1 <- 2.5 # As all other
-par2 <- 2.8 # As all other
-par3 <- 2.6 # As for dg2 (low grades over-represented but not as low for dg1)
-par4 <- 2.5 # As all other
-par5 <- 2.4 # As all other diagnoses (high grades over-represented)
-par6 <- 2.5 # As all other
-
-set.seed(100)
-
-df_dg3 <-
-
-  bind_cols(
-
-    # simulate grades of specific subjects
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = c(par1, par2, par3, par4, par5, par6),
-      dist = "poisson",
-      rho = 0.5,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("subject_", 1:6)
-    ),
-
-    # simulate covariates
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = seq(0.05, 0.5, length.out = 6), # less common than among dg1
-      dist = "binary",
-      rho = 0.2,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("covar_", 1:6)
-    ) %>%
-      select(-id)
-
-  ) %>%
-  as_tibble() %>%
-  mutate(
-
-    # pid
-    pid = id + 3e6,  # mark to start with 3
-
-    # start of follow-up
-    d_start = as.Date("2003-05-31"),
-
-    # time to dg and event of dg
-
-    time_dg3 = d_start + runif(n, 0, 12.5*365.25), # between 0 and 12.5 years
-    event_dg3 = 1 %>% rep(n) # event == 1
-
-  )
-
-# Simulate data for those without diagnoses -------------------------------
-
-n <- 56500
-
-par1 <- 2.5 # As all other
-par2 <- 2.8 # As all other
-par3 <- 2.3 # Higher than for diagnoses
-par4 <- 2.5 # As all other
-par5 <- 2.5 # Lower than for diagnoses
-par6 <- 2.5 # As all other
-
-set.seed(100)
-
-df_dg0 <-
-
-  bind_cols(
-
-    # simulate grades of specific subjects
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = c(par1, par2, par3, par4, par5, par6),
-      dist = "poisson",
-      rho = 0.5,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("subject_", 1:6)
-    ),
-
-    # simulate covariates
-    simstudy::genCorGen(
-      n,
-      nvars = 6,
-      params1 = seq(0.03, 0.45, length.out = 6), # less common than among those with dg
-      dist = "binary",
-      rho = 0.2,
-      corstr = "cs",
-      wide = TRUE,
-      cnames = paste0("covar_", 1:6)
-    ) %>%
-      select(-id)
-
-  ) %>%
-  as_tibble() %>%
-  mutate(
-
-    # pid
-    pid = id + 4e6,  # mark to start with 4
-
-    # start of follow-up
-    d_start = as.Date("2003-05-31"),
-
-    # time to dg and event of dg
-    time_dg1 = d_start + runif(n, 11.5*365.25, 12.5*365.25), # between 11.5and 12.5 years
-    event_dg1 = 0 %>% rep(n), # none
-
-    time_dg2 = d_start + runif(n, 11.5*365.25, 12.5*365.25),
-    event_dg2 = 0 %>% rep(n),
-
-    time_dg3 = d_start + runif(n, 11.5*365.25, 12.5*365.25),
-    event_dg3 = 0 %>% rep(n)
-
-  )
-
-
-# Combine and mutate data -------------------------------------------------
-
-# df_dg0 %>% summary()
-# df_dg1 %>% summary()
-# df_dg2 %>% summary()
-# df_dg3 %>% summary()
-
-df_all <-
-  bind_rows(
-    df_dg1,
-    df_dg2,
-    df_dg3,
-    df_dg0
-  ) %>%
-  mutate(
+    time_dg1 = d_start + time_dg1, 
+    time_dg2 = d_start + time_dg2, 
+    time_dg3 = d_start + time_dg3, 
+    
     subject_1 = 1-subject_1,  # inverse the tail of the distribution
     subject_2 = 1-subject_2,
     subject_3 = 1-subject_3,
@@ -364,7 +172,7 @@ df_all <-
     subject_4 = subject_4 + 9,
     subject_5 = subject_5 + 9,
     subject_6 = subject_6 + 9,
-
+    
     # full analysis sample diagnosis
     fas_dg = case_when(
       event_dg1 == 1 ~ "dg1",
@@ -372,21 +180,19 @@ df_all <-
       event_dg3 == 1 ~ "dg3",
       T ~ "none"
     ),
-
+    
     # date of birth
     dob = as.Date("1987-01-01") + runif(nrow(.), 0, 365),
-
+    
     # full analysis sample
-    fas = 1
-
-  ) %>%
+    fas = 1,
+    
+    # Average = (
+    #   subject_1 + subject_2 + subject_3 + subject_4 + subject_5 + subject_6
+    #   )/6
+  ) %>% 
   select(-id)
-
-# df_all %>% summary()
-# df_all %>% slice(1:5) %>% view()
-
-
-
+ 
 
 # Mutate grades <4 and >10 ------------------------------------------------
 
@@ -433,14 +239,13 @@ df_all <-
     # Average grade
     Average = (
       subject_1 + subject_2 + subject_3 + subject_4 + subject_5 + subject_6
-      ) / 6
+    ) / 6
   ) %>%
   select(pid, fas_dg, d_start,
          starts_with("time"),
          starts_with("event"),
          Average,
          everything())
-
 
 
 
@@ -476,3 +281,4 @@ vars_covar <-
   df_all %>%
   select(contains("covar")) %>%
   colnames()
+
