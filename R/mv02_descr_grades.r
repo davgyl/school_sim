@@ -289,20 +289,29 @@ plot_bar_spec
 pair_fn <- 
   function(data, mapping, ...) {
     p <- ggplot(data = data, mapping = mapping) +
-      geom_jitter(size = 0.5) + 
-      geom_smooth(method=loess, ...
+      geom_jitter(size = 0.5, alpha = 0.05) + 
+      geom_smooth(method=gam, ...
                   # , fill="red", color="red", ...
-                  ) +
-      # geom_smooth(method=lm, fill="blue", color="blue", ...) +
-      theme_minimal()
+                  )
+      # geom_smooth(method=lm, fill="blue", color="blue", ...) 
     p
   }
 
 fbc %>% 
   select(fas_dg, vars_avera, vars_grade) %>% 
-  sample_n(1000) %>% # Sample for testing
+  # sample_n(1000) %>% # Sample for quick testing
+  mutate(fas_dg = case_when(
+    fas_dg == "none" ~ "None", 
+    fas_dg == "psy" ~ "Psychosis",
+    fas_dg == "bipo" ~ "Bipolar",
+    fas_dg == "dep" ~ "Depression"
+  )) %>% 
   GGally::ggpairs(
-    columns = 2:ncol(.), 
+    # columns = 2:4, # few columns for quick testing
+    columns = 2:ncol(.),
     mapping = ggplot2::aes(color = fas_dg),
-    lower = list(continuous = pair_fn))
+    lower = list(continuous = pair_fn), 
+    diag = list(continuous = wrap("densityDiag", adjust = 4, alpha = 0.4))
+  ) +
+  theme_minimal()
 

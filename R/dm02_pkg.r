@@ -11,6 +11,7 @@ packages <- c(
   "openxlsx",
   "modelr",
   "cowplot",
+  "GGally",
   "survival",
   "mgcv",
   "lubridate",
