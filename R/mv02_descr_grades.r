@@ -286,32 +286,63 @@ plot_bar_spec
 # Correlation -------------------------------------------------------------
 
 # Modifed example: http://padamson.github.io/r/ggally/ggplot2/ggpairs/2016/02/16/multiple-regression-lines-with-ggpairs.html
-pair_fn <- 
+
+# Linear
+pair_linear <-
   function(data, mapping, ...) {
     p <- ggplot(data = data, mapping = mapping) +
-      geom_jitter(size = 0.5, alpha = 0.05) + 
-      geom_smooth(method=gam, ...
-                  # , fill="red", color="red", ...
-                  )
-      # geom_smooth(method=lm, fill="blue", color="blue", ...) 
+      # geom_jitter(size = 0.5, alpha = 0.05) +
+      # geom_smooth(method="gam", formula = y ~ s(x, bs = "tp", k = 5), ...
+      # , fill="red", color="red", ...
+      # )
+      geom_smooth(method=lm, ...
+                  # fill="blue", color="blue", ...
+      )
     p
   }
 
-fbc %>% 
-  select(fas_dg, vars_avera, vars_grade) %>% 
+# Non-linear
+pair_nonlinear <-
+  function(data, mapping, ...) {
+    p <- ggplot(data = data, mapping = mapping) +
+      # geom_jitter(size = 0.5, alpha = 0.05) +
+      geom_smooth(method="gam", formula = y ~ s(x, bs = "tp", k = 5), ...
+                  # , fill="red", color="red", ...
+      )
+    # geom_smooth(method=lm, ...
+    # fill="blue", color="blue", ...
+    # )
+    p
+  }
+
+cor_plot_data <-
+  fbc %>%
+  select(fas_dg, vars_avera, vars_grade) %>%
   # sample_n(1000) %>% # Sample for quick testing
-  mutate(fas_dg = case_when(
-    fas_dg == "none" ~ "None", 
-    fas_dg == "psy" ~ "Psychosis",
-    fas_dg == "bipo" ~ "Bipolar",
-    fas_dg == "dep" ~ "Depression"
-  )) %>% 
+  mutate(
+    fas_dg = case_when(
+      fas_dg == "none" ~ "None",
+      fas_dg == "psy" ~ "Psychosis",
+      fas_dg == "bipo" ~ "Bipolar",
+      fas_dg == "dep" ~ "Depression")
+  ) %>%
+  rename(
+    `Native Language` = Literature,
+    `Physical Education` = Phys_Edu
+  )
+
+cor_plot2 <-
+  cor_plot_data %>%
   GGally::ggpairs(
-    # columns = 2:4, # few columns for quick testing
+    # columns = c(2, 3, 7), # few columns for quick testing
     columns = 2:ncol(.),
     mapping = ggplot2::aes(color = fas_dg),
-    lower = list(continuous = pair_fn), 
-    diag = list(continuous = wrap("densityDiag", adjust = 4, alpha = 0.4))
+    lower = list(continuous = pair_nonlinear),
+    upper = list(continuous = pair_linear),
+    diag = list(continuous = wrap("densityDiag", adjust = 10, alpha = 0.4))
   ) +
   theme_minimal()
+
+cor_plot2
+# ggsave("figures/cor_plot2.pdf", cor_plot2, h = 7, w = 6, s = 2.75)
 
