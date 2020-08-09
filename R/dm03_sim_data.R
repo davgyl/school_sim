@@ -70,6 +70,48 @@ df_tot <-
   
   )
 
+# psy
+# int: 5.3
+# covar1-6
+# 6: 0.23 (sex)
+# 2: 0.97 (par_psy)
+# 4: 0.37 (par_dep)
+# 5: 0.3 (urban)
+# subject1-6
+# 3: -0.36
+# 4: -0.33
+# 5: -1.22
+# 5^2: 0.085
+
+# bipo
+# int: 0.68
+# covar
+# 6: -0.55 (sex)
+# 1: 0.74 (par_bipo)
+# 4: 0.72 (par_dep)
+# 5: 0.21 (urban)
+# subject
+# 1: 0.17
+# 2: -0.14
+# 3: -0.35
+# 4: -0.26
+# 5: -0.56
+# 5^2: 0.44
+
+# dep
+# int: 3.11
+# 6: -0.67
+# 4: 0.67
+# 5: 0.16
+# subjects
+# 1: 0.08
+# 2: -0.09
+# 3: -0.38
+# 4: -0.14
+# 5: -0.52
+# 5^2: 0.04
+
+
 # Utlize and modify function in example of cox.ph {mgcv}
 ph.weibull.sim <- function(eta, gamma=0.5, h0=1e-3, t1=12.5*365.25) { 
   lambda <- h0*exp(eta)
