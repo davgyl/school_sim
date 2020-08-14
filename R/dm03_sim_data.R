@@ -63,178 +63,12 @@ df_tot <-
   mutate(
     
     # pid
-    pid = id + 1e6,  
+    pid = id + 1e6,
     
     # start of follow-up
     d_start = as.Date("2003-05-31")
   
   )
-
-# psy
-# int: 5.3
-# covar1-6
-# 6: 0.23 (sex)
-# 2: 0.97 (par_psy)
-# 4: 0.37 (par_dep)
-# 5: 0.3 (urban)
-# subject1-6
-# 3: -0.36
-# 4: -0.33
-# 5: -1.22
-# 5^2: 0.085
-
-# bipo
-# int: 0.68
-# covar
-# 6: -0.55 (sex)
-# 1: 0.74 (par_bipo)
-# 4: 0.72 (par_dep)
-# 5: 0.21 (urban)
-# subject
-# 1: 0.17
-# 2: -0.14
-# 3: -0.35
-# 4: -0.26
-# 5: -0.56
-# 5^2: 0.44
-
-# dep
-# int: 3.11
-# 6: -0.67
-# 4: 0.67
-# 5: 0.16
-# subjects
-# 1: 0.08
-# 2: -0.09
-# 3: -0.38
-# 4: -0.14
-# 5: -0.52
-# 5^2: 0.04
-
-
-# Utlize and modify function in example of cox.ph {mgcv}
-ph.weibull.sim <- function(eta, gamma=0.5, h0=1e-3, t1=12.5*365.25) { 
-  lambda <- h0*exp(eta)
-  n <- length(eta)
-  U <- runif(n)
-  t <- (-log(U)/lambda)^(1/gamma)
-  d <- as.numeric(t <= t1)
-  t[!d] <- t1
-  list(t=t,d=d)
-}
-
-# dg1
-f0 <- function(x) -0.5*x
-f1 <- function(x) -0.5*x
-f2 <- function(x) -0.3*x + 0.03*x^3
-f3 <- function(x) 0.6*x
-f4 <- function(x) 0.3*x
-f <- 
-  f0(df_tot$subject_1) + 
-  f1(df_tot$subject_2) + 
-  f2(df_tot$subject_3) +
-  f3(df_tot$covar_1) + 
-  f4(df_tot$covar_2) 
-  
-g <- (f-mean(f))/5
-ssurv_1 <- ph.weibull.sim(g)
-# ssurv_1 %>% as_tibble() %>% mutate(t = round(t, 1))
-# ssurv_1 %>% as_tibble() %>% count(d)
-
-# dg2
-f0 <- function(x) -0.4*x
-f1 <- function(x) -0.4*x
-f2 <- function(x) -0.3*x + 0.02*x^3
-f3 <- function(x) 0.5*x
-f4 <- function(x) 0.3*x
-f <- 
-  f0(df_tot$subject_1) + 
-  f1(df_tot$subject_2) + 
-  f2(df_tot$subject_3) +
-  f3(df_tot$covar_1) + 
-  f4(df_tot$covar_2) 
-
-g <- (f-mean(f))/5
-ssurv_2 <- ph.weibull.sim(g)
-# ssurv_2 %>% as_tibble() %>% count(d)
-
-# dg3
-f0 <- function(x) -0.4*x
-f1 <- function(x) -0.4*x
-f2 <- function(x) -0.2*x + 0.01*x^3
-f3 <- function(x) 0.4*x
-f4 <- function(x) 0.3*x
-f <- 
-  f0(df_tot$subject_1) + 
-  f1(df_tot$subject_2) + 
-  f2(df_tot$subject_3) +
-  f3(df_tot$covar_1) + 
-  f4(df_tot$covar_2) 
-
-g <- (f-mean(f))/5
-ssurv_3 <- ph.weibull.sim(g)
-# ssurv_3 %>% as_tibble() %>% count(d)
-
-df_all <- 
-  bind_cols(
-    df_tot, 
-    ssurv_1 %>% 
-      as_tibble() %>% 
-      rename(
-        time_dg1 = t, 
-        event_dg1 = d
-      ), 
-    ssurv_2 %>% 
-      as_tibble() %>% 
-      rename(
-        time_dg2 = t, 
-        event_dg2 = d
-      ), 
-    ssurv_3 %>% 
-      as_tibble() %>% 
-      rename(
-        time_dg3 = t, 
-        event_dg3 = d
-      )
-  ) %>% 
-  mutate(
-    time_dg1 = d_start + time_dg1, 
-    time_dg2 = d_start + time_dg2, 
-    time_dg3 = d_start + time_dg3, 
-    
-    subject_1 = 1-subject_1,  # inverse the tail of the distribution
-    subject_2 = 1-subject_2,
-    subject_3 = 1-subject_3,
-    subject_4 = 1-subject_4,
-    subject_5 = 1-subject_5,
-    subject_6 = 1-subject_6,
-    subject_1 = subject_1 + 9,
-    subject_2 = subject_2 + 9,
-    subject_3 = subject_3 + 9,
-    subject_4 = subject_4 + 9,
-    subject_5 = subject_5 + 9,
-    subject_6 = subject_6 + 9,
-    
-    # full analysis sample diagnosis
-    fas_dg = case_when(
-      event_dg1 == 1 ~ "dg1",
-      event_dg2 == 1 ~ "dg2",
-      event_dg3 == 1 ~ "dg3",
-      T ~ "none"
-    ),
-    
-    # date of birth
-    dob = as.Date("1987-01-01") + runif(nrow(.), 0, 365),
-    
-    # full analysis sample
-    fas = 1,
-    
-    # Average = (
-    #   subject_1 + subject_2 + subject_3 + subject_4 + subject_5 + subject_6
-    #   )/6
-  ) %>% 
-  select(-id)
- 
 
 # Mutate grades <4 and >10 ------------------------------------------------
 
@@ -250,9 +84,27 @@ df_all <-
 #   facet_wrap("subject", nrow = 2) +
 #   geom_bar(stat = "identity")
 
+df_tot <- 
+  df_tot %>% 
+  mutate(
+    subject_1 = 1-subject_1,  # inverse the tail of the distribution
+    subject_2 = 1-subject_2,
+    subject_3 = 1-subject_3,
+    subject_4 = 1-subject_4,
+    subject_5 = 1-subject_5,
+    subject_6 = 1-subject_6,
+    subject_1 = subject_1 + 9,
+    subject_2 = subject_2 + 9,
+    subject_3 = subject_3 + 9,
+    subject_4 = subject_4 + 9,
+    subject_5 = subject_5 + 9,
+    subject_6 = subject_6 + 9
+  ) %>% 
+  select(-id)
 
-df_all_long <-
-  df_all %>%
+
+df_tot_long <-
+  df_tot %>%
   select(pid, contains("subject")) %>%
   pivot_longer(
     contains("subject"),
@@ -267,11 +119,11 @@ df_all_long <-
     )
   )
 
-df_all <-
-  df_all %>%
+df_tot <-
+  df_tot %>%
   select(-contains("subject")) %>%
   left_join(
-    df_all_long %>%
+    df_tot_long %>%
       pivot_wider( # wide again
         names_from = subject,
         values_from = grade
@@ -283,18 +135,124 @@ df_all <-
       subject_1 + subject_2 + subject_3 + subject_4 + subject_5 + subject_6
     ) / 6
   ) %>%
-  select(pid, fas_dg, d_start,
-         starts_with("time"),
-         starts_with("event"),
+  select(pid, 
+         # fas_dg, 
+         d_start,
+         # starts_with("time"),
+         # starts_with("event"),
          Average,
          everything())
 
 
 
+# Outcomes ----------------------------------------------------------------
+
+x <- df_tot %>% 
+  select(-d_start) %>% 
+  as.matrix()
+
+# Add intercept and effects
+b_dg1 <- 
+  # 5.3 + 
+  3.5 +
+  0.97*x[,  "covar_2"] +
+  0.37*x[,  "covar_4"] +
+  0.30*x[,  "covar_5"] +
+  0.23*x[,  "covar_6"] +
+  -0.36*x[,  "subject_3"] +
+  -0.33*x[,  "subject_4"] +
+  -1.22*x[,  "subject_5"] +
+  0.085*x[,  "subject_5"]^2
+
+b_dg2 <- 
+  # 0.68 +
+  -36 +
+  0.74*x[,  "covar_1"] +
+  0.72*x[,  "covar_4"] +
+  0.21*x[,  "covar_5"] +
+  -0.55*x[,  "covar_6"] +
+  0.17*x[,  "subject_1"] +
+  -0.14*x[,  "subject_2"] +
+  -0.35*x[,  "subject_3"] +
+  -0.26*x[,  "subject_4"] +
+  -0.56*x[,  "subject_5"] +
+  0.44*x[,  "subject_5"]^2
+
+b_dg3 <- 
+  # 3.11 +
+  1.7 +
+  0.67*x[,  "covar_4"] +
+  0.16*x[,  "covar_5"] +
+  -0.67*x[,  "covar_6"] +
+  0.08*x[,  "subject_3"] +
+  -0.09*x[,  "subject_3"] +
+  -0.38*x[,  "subject_3"] +
+  -0.14*x[,  "subject_4"] +
+  -0.52*x[,  "subject_5"] +
+  0.04*x[,  "subject_5"]^2
+
+# Inverse logit function
+prob_dg1 = 1/(1 + exp(-b_dg1)) 
+prob_dg2 = 1/(1 + exp(-b_dg2)) 
+prob_dg3 = 1/(1 + exp(-b_dg3)) 
+
+event_dg1 = rbinom(n, 1, prob_dg1)
+event_dg2 = rbinom(n, 1, prob_dg2)
+event_dg3 = rbinom(n, 1, prob_dg3)
+
+table(event_dg1)
+table(event_dg2)
+table(event_dg3)
+
+df_tot <- 
+  bind_cols(
+    df_tot, 
+    event_dg1 = event_dg1,
+    event_dg2 = event_dg2,
+    event_dg3 = event_dg3
+  )
+
+df_tot <-
+  df_tot %>% 
+  mutate(
+    time_dg1 = case_when(
+      event_dg1 == 0 ~ d_start + runif(nrow(.), 11.5*365.25, 12.5*365.25),
+      event_dg1 == 1 ~ d_start + runif(nrow(.), 1, 12.5*365.25)
+    ),
+    time_dg2 = case_when(
+      event_dg2 == 0 ~ d_start + runif(nrow(.), 11.5*365.25, 12.5*365.25),
+      event_dg2 == 1 ~ d_start + runif(nrow(.), 1, 12.5*365.25)
+    ),
+    time_dg3 = case_when(
+      event_dg3 == 0 ~ d_start + runif(nrow(.), 11.5*365.25, 12.5*365.25),
+      event_dg3 == 1 ~ d_start + runif(nrow(.), 1, 12.5*365.25)
+    )
+  )
+
+# Other variables ---------------------------------------------------------
+
+df_tot <- 
+  df_tot %>% 
+  mutate(
+    # full analysis sample diagnosis
+    fas_dg = case_when(
+      event_dg1 == 1 ~ "dg1",
+      event_dg2 == 1 ~ "dg2",
+      event_dg3 == 1 ~ "dg3",
+      T ~ "none"
+    ),
+    
+    # date of birth
+    dob = as.Date("1987-01-01") + runif(nrow(.), 0, 365),
+    
+    # full analysis sample
+    fas = 1
+  )
+
 # Rename variables to same as in real data --------------------------------
 
 df_all <-
-  df_all %>%
+  df_tot %>%
   rename(
     Literature  = subject_1,
     Mathematics = subject_2,
