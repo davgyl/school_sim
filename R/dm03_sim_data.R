@@ -154,7 +154,7 @@ x <- df_tot %>%
 # Add intercept and effects
 b_dg1 <- 
   # 5.3 + 
-  3.5 +
+  4.1 +
   0.97*x[,  "covar_2"] +
   0.37*x[,  "covar_4"] +
   0.30*x[,  "covar_5"] +
@@ -180,7 +180,7 @@ b_dg2 <-
 
 b_dg3 <- 
   # 3.11 +
-  1.7 +
+  2.4 +
   0.67*x[,  "covar_4"] +
   0.16*x[,  "covar_5"] +
   -0.67*x[,  "covar_6"] +
@@ -195,6 +195,8 @@ b_dg3 <-
 prob_dg1 = 1/(1 + exp(-b_dg1)) 
 prob_dg2 = 1/(1 + exp(-b_dg2)) 
 prob_dg3 = 1/(1 + exp(-b_dg3)) 
+
+set.seed(100)
 
 event_dg1 = rbinom(n, 1, prob_dg1)
 event_dg2 = rbinom(n, 1, prob_dg2)
@@ -213,7 +215,7 @@ df_tot <-
   )
 
 df_tot <-
-  df_tot %>% 
+  df_tot %>%
   mutate(
     time_dg1 = case_when(
       event_dg1 == 0 ~ d_start + runif(nrow(.), 11.5*365.25, 12.5*365.25),
