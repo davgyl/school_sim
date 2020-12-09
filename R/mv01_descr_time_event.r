@@ -10,14 +10,69 @@ source("R/dm02_pkg.r")
 # If simulated data
 # NOTE: not resembling real data although same variable names
 source("R/dm03_sim_data.R")
-fbc <- df_all
+# fbc <- df_all # If with other colnames
+fbc <- df_tot
 
 
 # Table 1 -----------------------------------------------------------------
 
+# Scaled grades
+fbc_tab <-
+  fbc %>%
+  mutate_at(c(vars_avera, vars_grade), compose(c, scale)) %>%
+  mutate_at(
+    vars(starts_with("time")),
+    ~ ((d_start - 1) %--% .) / years(1)
+  ) %>%
+  mutate(
+    all = "all",
+    
+    # For simulation data
+    Average_c = cut(Average, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    
+    subject_1_c = cut(subject_1, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F) ,
+    subject_2_c = cut(subject_2, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    subject_3_c = cut(subject_3, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F) ,
+    subject_4_c = cut(subject_4, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    subject_5_c = cut(subject_5, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    subject_6_c = cut(subject_6, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    
+    Average_c2 = cut(Average, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    
+    subject_1_c2 = cut(subject_1, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F) ,
+    subject_2_c2 = cut(subject_2, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    subject_3_c2 = cut(subject_3, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F) ,
+    subject_4_c2 = cut(subject_4, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    subject_5_c2 = cut(subject_5, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    subject_6_c2 = cut(subject_6, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F)
+    
+    
+    # For real data
+    # Literature_c = cut(Literature, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F) ,
+    # Mathematics_c = cut(Mathematics, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    # Phys_Edu_c = cut(Phys_Edu, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F) ,
+    # Handicrafts_c = cut(Handicrafts, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    # Arts_c = cut(Arts, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    # Music_c = cut(Music, breaks = c(-Inf, -1.5, -1, -0.5, 0.5, 1, 1.5, Inf), right = F),
+    # 
+    # Average_c2 = cut(Average, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    # Literature_c2 = cut(Literature, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F) ,
+    # Mathematics_c2 = cut(Mathematics, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    # Phys_Edu_c2 = cut(Phys_Edu, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F) ,
+    # Handicrafts_c2 = cut(Handicrafts, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    # Arts_c2 = cut(Arts, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F),
+    # Music_c2 = cut(Music, breaks = c(-Inf, -1.5, -0.5, 0.5, 1.5, Inf), right = F)
+  )
+
+strata <- c("all", vars_covar,
+            "Average_c",
+            paste0(vars_grade, "_c"),
+            "Average_c2",
+            paste0(vars_grade, "_c2"))
+
 # With original grades (non-scaled)
 
-fbc_tab <-
+fbc_tab_orig <-
   fbc %>%
   mutate_at(
     vars(starts_with("time")),
@@ -37,8 +92,18 @@ fbc_tab <-
     Music_c = cut(Music, breaks = c(-Inf, 6, 7, 8, 9, Inf))
   )
 
+strata <- c("all", 
+            vars_covar,
+            "Average_c", 
+            "Average_c2", 
+            "Average_int",
+            "Average_round",
+            vars_grade, 
+            paste0(vars_grade, "_c"))
+
+# Same for scaled and non-scaled
 fbc_long <-
-  fbc_tab %>%
+  fbc_tab %>% # or fbc_tab_orig if non-scaled
   pivot_longer(
     cols = matches("^(event|time)_"),
     names_sep = "_",
@@ -55,9 +120,6 @@ cumulative_incidence <- function(x, at = Inf) {
     mutate_all(~ (1 - .) * 100)
 }
 
-strata <- c("all", vars_covar,
-            "Average_c", "Average_c2", "Average_int", "Average_round",
-            vars_grade, paste0(vars_grade, "_c"))
 
 table_1_data_nonsc <-
   map_df(strata, ~ {
