@@ -14,7 +14,8 @@ source("R/dm02_pkg.r")
 
 # If simulated data
 source("R/dm03_sim_data.R")
-fbc <- df_all
+# fbc <- df_all # If with other colnames
+fbc <- df_tot
 
 # Scaled vs non-scaled ----------------------------------------------------
 
