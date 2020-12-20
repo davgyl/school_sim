@@ -1,12 +1,6 @@
 # School grades (descr_grades.r)
 #
-# Report separately for 1987- and 1997 cohorts
-# Histogram of non-scaled measures in total sample and subjects with an event
-# Mean, SD, median, range of non-scaled measures in total sample and subjects
-# with an event
-# Histogram of scaled measures in total sample and subjects with an event
-# Mean, SD, median, range of scaled measures in total sample (mean = 0, SD = 1)
-# and subjects with an event
+# Describe school grades
 
 source("R/dm02_pkg.r")
 
@@ -166,51 +160,104 @@ subject_labels <-
   tibble(
     Subject = c(
       "Average"     ,
-      "Literature"  ,
-      "Mathematics" ,
-      "Phys_Edu"    ,
-      "Handicrafts" ,
-      "Arts"        ,
-      "Music"       ),
+      "subject_1"  ,
+      "subject_2" ,
+      "subject_3"    ,
+      "subject_4" ,
+      "subject_5"        ,
+      "subject_6"       ),
     Subject_labels = c(
       "Average",
-      "Native language",
-      "Mathematics",
-      "Physical Education",
-      "Handicrafts",
-      "Arts",
-      "Music"
+      "Subject 1",
+      "Subject 2",
+      "Subject 3",
+      "Subject 4",
+      "Subject 5",
+      "Subject 6"
     )
   )
+
+# For real data
+# subject_labels <-
+#   tibble(
+#     Subject = c(
+#       "Average"     ,
+#       "Literature"  ,
+#       "Mathematics" ,
+#       "Phys_Edu"    ,
+#       "Handicrafts" ,
+#       "Arts"        ,
+#       "Music"       ),
+#     Subject_labels = c(
+#       "Average",
+#       "Native language",
+#       "Mathematics",
+#       "Physical Education",
+#       "Handicrafts",
+#       "Arts",
+#       "Music"
+#     )
+#   )
 
 fas_dg_labels <-
   tibble(
     fas_dg = c(
-      "psy"     ,
-      "bipo"  ,
-      "dep" ,
+      "dg1"     ,
+      "dg2"  ,
+      "dg3" ,
       "none"       ),
     Diagnosis = c(
-      "Non-affective psychosis",
-      "Bipolar disorder",
-      "Depression",
+      "Diagnosis 1",
+      "Diagnosis 2",
+      "Diagnosis 3",
       "None"
     )
   )
 
-fill_order <- c("Non-affective psychosis",
-                "Bipolar disorder",
-                "Depression",
+# For real data
+# fas_dg_labels <-
+#   tibble(
+#     fas_dg = c(
+#       "psy"     ,
+#       "bipo"  ,
+#       "dep" ,
+#       "none"       ),
+#     Diagnosis = c(
+#       "Non-affective psychosis",
+#       "Bipolar disorder",
+#       "Depression",
+#       "None"
+#     )
+#   )
+
+fill_order <- c("Diagnosis 1",
+                "Diagnosis 2",
+                "Diagnosis 3",
                 "None")
 
 facet_order <- c(
-  "Native language",
-  "Mathematics",
-  "Physical Education",
-  "Handicrafts",
-  "Arts",
-  "Music"
+  "Subject 1",
+  "Subject 2",
+  "Subject 3",
+  "Subject 4",
+  "Subject 5",
+  "Subject 6"
 )
+
+# For real data
+# fill_order <- c("Non-affective psychosis",
+#                 "Bipolar disorder",
+#                 "Depression",
+#                 "None")
+# 
+# facet_order <- c(
+#   "Native language",
+#   "Mathematics",
+#   "Physical Education",
+#   "Handicrafts",
+#   "Arts",
+#   "Music"
+# )
 
 # fbc %>%
 #   select(Average) %>%
@@ -318,19 +365,20 @@ pair_nonlinear <-
 
 cor_plot_data <-
   fbc %>%
-  select(fas_dg, vars_avera, vars_grade) %>%
+  select(fas_dg, vars_avera, vars_grade)  #%>%
   # sample_n(1000) %>% # Sample for quick testing
-  mutate(
-    fas_dg = case_when(
-      fas_dg == "none" ~ "None",
-      fas_dg == "psy" ~ "Psychosis",
-      fas_dg == "bipo" ~ "Bipolar",
-      fas_dg == "dep" ~ "Depression")
-  ) %>%
-  rename(
-    `Native Language` = Literature,
-    `Physical Education` = Phys_Edu
-  )
+  # For real data:
+  # mutate(
+  #   fas_dg = case_when(
+  #     fas_dg == "none" ~ "None",
+  #     fas_dg == "psy" ~ "Psychosis",
+  #     fas_dg == "bipo" ~ "Bipolar",
+  #     fas_dg == "dep" ~ "Depression")
+  # ) %>%
+  # rename(
+  #   `Native Language` = Literature,
+  #   `Physical Education` = Phys_Edu
+  # )
 
 cor_plot2 <-
   cor_plot_data %>%

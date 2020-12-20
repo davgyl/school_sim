@@ -14,8 +14,6 @@ source("R/dm02_pkg.R")
 
 # event_dg1 ... event_dg3 = event for dg1 ... dg3
 
-# NOTE: Rename variables to same in real data although the cumulative incidence and associations are different from the real data.
-
 # Simulate total data and add survival outcomes ---------------------------
 
 n <- 60000
@@ -166,7 +164,9 @@ b_dg1 <-
 
 b_dg2 <- 
   # 0.68 +
-  -36 +
+  # -36 +
+  # 1 +
+  -3 +
   0.74*x[,  "covar_1"] +
   0.72*x[,  "covar_4"] +
   0.21*x[,  "covar_5"] +
@@ -176,7 +176,9 @@ b_dg2 <-
   -0.35*x[,  "subject_3"] +
   -0.26*x[,  "subject_4"] +
   -0.56*x[,  "subject_5"] +
-  0.44*x[,  "subject_5"]^2
+  0.1*x[,  "subject_5"]^2
+# 0.044*x[,  "subject_5"]^2
+# 0.44*x[,  "subject_5"]^2
 
 b_dg3 <- 
   # 3.11 +
@@ -256,37 +258,4 @@ vars_grade <-
   df_tot %>%
   select(contains("subject")) %>%
   colnames()
-
-# Rename variables to same as in real data --------------------------------
-
-# df_all <-
-#   df_tot %>%
-#   rename(
-#     Literature  = subject_1,
-#     Mathematics = subject_2,
-#     Phys_Edu    = subject_3,
-#     Handicrafts = subject_4,
-#     Arts        = subject_5,
-#     Music       = subject_6,
-#     time_psy    = time_dg1,
-#     time_bipo   = time_dg2,
-#     time_dep    = time_dg3,
-#     event_psy    = event_dg1,
-#     event_bipo   = event_dg2,
-#     event_dep    = event_dg3
-#   ) %>%
-#   mutate(
-#     fas_dg = case_when( # dg during follow-up of fas
-#       event_psy == 1 ~ "psy",
-#       event_bipo == 1 ~ "bipo",
-#       event_dep == 1 ~ "dep",
-#       T ~ "none"
-#     )
-#   )
-# 
-# # Write over vars_covar (in utils)
-# vars_covar <-
-#   df_all %>%
-#   select(contains("covar")) %>%
-#   colnames()
 

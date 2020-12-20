@@ -8,7 +8,6 @@
 source("R/dm02_pkg.r")
 
 # If simulated data
-# NOTE: not resembling real data although same variable names
 source("R/dm03_sim_data.R")
 # fbc <- df_all # If with other colnames
 fbc <- df_tot
@@ -72,34 +71,34 @@ strata <- c("all", vars_covar,
 
 # With original grades (non-scaled)
 
-fbc_tab_orig <-
-  fbc %>%
-  mutate_at(
-    vars(starts_with("time")),
-    ~ ((d_start - 1) %--% .) / years(1)
-  ) %>%
-  mutate(
-    all = "all" ,
-    Average_int = as.integer(Average),
-    Average_round = round(Average, 0),
-    Average_c = cut(Average, breaks = c(-Inf, 6, 7, 8, 9, Inf)) ,
-    Average_c2 = cut(Average, breaks = c(-Inf, 4:10, Inf)) ,
-    Literature_c = cut(Literature, breaks = c(-Inf, 6, 7, 8, 9, Inf)) ,
-    Mathematics_c = cut(Mathematics, breaks = c(-Inf, 6, 7, 8, 9, Inf)),
-    Phys_Edu_c = cut(Phys_Edu, breaks = c(-Inf, 6, 7, 8, 9, Inf)) ,
-    Handicrafts_c = cut(Handicrafts, breaks = c(-Inf, 6, 7, 8, 9, Inf)),
-    Arts_c = cut(Arts, breaks = c(-Inf, 6, 7, 8, 9, Inf)),
-    Music_c = cut(Music, breaks = c(-Inf, 6, 7, 8, 9, Inf))
-  )
-
-strata <- c("all", 
-            vars_covar,
-            "Average_c", 
-            "Average_c2", 
-            "Average_int",
-            "Average_round",
-            vars_grade, 
-            paste0(vars_grade, "_c"))
+# fbc_tab_orig <-
+#   fbc %>%
+#   mutate_at(
+#     vars(starts_with("time")),
+#     ~ ((d_start - 1) %--% .) / years(1)
+#   ) %>%
+#   mutate(
+#     all = "all" ,
+#     Average_int = as.integer(Average),
+#     Average_round = round(Average, 0),
+#     Average_c = cut(Average, breaks = c(-Inf, 6, 7, 8, 9, Inf)) ,
+#     Average_c2 = cut(Average, breaks = c(-Inf, 4:10, Inf)) ,
+#     Literature_c = cut(Literature, breaks = c(-Inf, 6, 7, 8, 9, Inf)) ,
+#     Mathematics_c = cut(Mathematics, breaks = c(-Inf, 6, 7, 8, 9, Inf)),
+#     Phys_Edu_c = cut(Phys_Edu, breaks = c(-Inf, 6, 7, 8, 9, Inf)) ,
+#     Handicrafts_c = cut(Handicrafts, breaks = c(-Inf, 6, 7, 8, 9, Inf)),
+#     Arts_c = cut(Arts, breaks = c(-Inf, 6, 7, 8, 9, Inf)),
+#     Music_c = cut(Music, breaks = c(-Inf, 6, 7, 8, 9, Inf))
+#   )
+# 
+# strata <- c("all", 
+#             vars_covar,
+#             "Average_c", 
+#             "Average_c2", 
+#             "Average_int",
+#             "Average_round",
+#             vars_grade, 
+#             paste0(vars_grade, "_c"))
 
 # Same for scaled and non-scaled
 fbc_long <-
@@ -121,7 +120,7 @@ cumulative_incidence <- function(x, at = Inf) {
 }
 
 
-table_1_data_nonsc <-
+table_1_data <-
   map_df(strata, ~ {
   fbc_long %>%
     group_by(outcome, chracteristic = .x, value = !!sym(.x)) %>%
@@ -139,9 +138,9 @@ table_1_data_nonsc <-
 
 
 # openxlsx::write.xlsx(
-#   table_1_data_nonsc %>% select(-km_fit),
+#   table_1_data %>% select(-km_fit),
 #   paste0(
-#     "figures/table_1_data_nonsc_",
+#     "figures/table_1_data_",
 #     Sys.Date(),
 #     ".xlsx"
 #   )
