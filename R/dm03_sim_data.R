@@ -1,5 +1,6 @@
 
-source("R/dm02_pkg.R")
+# Read previous scripts
+# source("R/dm02_pkg.R")
 
 # README ------------------------------------------------------------------
 
@@ -125,7 +126,8 @@ df_tot <-
       pivot_wider( # wide again
         names_from = subject,
         values_from = grade
-      )
+      ), 
+    by = "pid"
   ) %>%
   mutate(
     # Average grade
@@ -259,3 +261,7 @@ vars_grade <-
   select(contains("subject")) %>%
   colnames()
 
+vars_covar <-
+  df_tot %>%
+  select(contains("covar")) %>%
+  colnames()

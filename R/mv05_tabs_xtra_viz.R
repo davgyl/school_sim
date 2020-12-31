@@ -7,7 +7,6 @@ path <- file.path("")
 
 # Descriptive table -------------------------------------------------------
 
-
 raw_table <- "table_1_data_scaled_DATE"
 
 df <- 

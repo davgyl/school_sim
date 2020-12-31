@@ -1,8 +1,12 @@
+
+# Read previous scripts
+# source("R/dm02_pkg.r")
+
+
 # School grades (descr_grades.r)
 #
 # Describe school grades
 
-source("R/dm02_pkg.r")
 
 # Read data ---------------------------------------------------------------
 

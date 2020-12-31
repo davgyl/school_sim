@@ -1,18 +1,16 @@
-# Table of contrasts at given grade
-
-# Utils and packages ------------------------------------------------------
-
-source("R/dm02_pkg.r")
+# Read previous scripts
+# source("R/dm02_pkg.r")
+# If simulated data
+# NOTE: not resembling real data although same variable names
+# source("R/dm03_sim_data.R")
+fbc <- df_tot
 
 # Read in data ------------------------------------------------------------
 
 # Fits from previous script
 model_fits <- model_fits_scaled
 
-# If simulated data
-# NOTE: not resembling real data although same variable names
-source("R/dm03_sim_data.R")
-fbc <- df_all
+# Table of contrasts at given grade
 
 # Mutate
 

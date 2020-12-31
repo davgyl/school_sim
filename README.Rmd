@@ -9,14 +9,56 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## Introduction
-This document shows how to simulate data, preprocess data, performing the analyses and vizualize the results as described in the manuscript 'xxxxx'.  
+This document shows how to simulate data, perform the analyses and vizualize the results as described in the manuscript 'School Performance and Later Diagnoses of Non-Affective Psychoses, Bipolar Disorder and Depression'.  
 
 ## Load functions
 
 Clone the repository from <https://github.com/davgyl/school_sim.git> and load the functions from the R-scripts.  
 
+## Simulate data
+
 ```{r chunk_01}
+
+source("R/dm01_utils.R")
+source("R/dm02_pkg.r")
+source("R/dm03_sim_data.R")
+fbc <- df_tot
+# Show simulated data
+fbc
+```
+
+## Descriptive analyses
+
+```{r chunk_02}
+
+source("R/mv01_descr_time_event.r")
+table_1_data %>% select(-km_fit)
+summary_age
 
 ```
 
-## Simulate data
+## Modelling and visualization
+
+To model the associations, run ´R/mv03_fit_modelst.r´. 
+To model the associations, run ´R/mv03_fit_modelst.r´. 
+To model the associations, run ´R/mv03_fit_modelst.r´. 
+
+## Version of packages
+
+```{r chunk_03, echo=TRUE}
+
+packageVersion("tidyverse")
+packageVersion("openxlsx")
+packageVersion("modelr")
+packageVersion("cowplot")
+packageVersion("GGally")
+packageVersion("survival")
+packageVersion("mgcv")
+packageVersion("lubridate")
+packageVersion("broom")
+packageVersion("sf")
+packageVersion("knitr")
+packageVersion("gridExtra")
+packageVersion("simstudy")
+
+```

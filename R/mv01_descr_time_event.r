@@ -1,3 +1,10 @@
+# Read previous scripts
+# source("R/dm02_pkg.r")
+
+# If simulated data
+# source("R/dm03_sim_data.R")
+
+
 # Time-to-event data 
 #
 # Number of subjects at start of follow-up stratified by covariates
@@ -5,10 +12,7 @@
 # Number of events
 # Age at event (mean, SD, median, range)
 
-source("R/dm02_pkg.r")
 
-# If simulated data
-source("R/dm03_sim_data.R")
 # fbc <- df_all # If with other colnames
 fbc <- df_tot
 

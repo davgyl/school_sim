@@ -1,16 +1,18 @@
+
+# Read previous scripts
+# source("R/dm02_pkg.r")
+# If simulated data 
+# NOTE: not resembling real data although same variable names
+# source("R/dm03_sim_data.R") 
+
 # Multivariate model with the average school grade and all covariates
 # Multivariate model with all school subject grades and all covariates
 #	One model for each outcome. Include all school grades (splines) and covariates in the model
 #	Define smoothing parameter lambda for each thin plate smoothing spline using generalized cross validation
 #	Fit models and save model summaries for later visualization
 
-source("R/dm02_pkg.r")
-
 # Read data ---------------------------------------------------------------
 
-# If simulated data 
-# NOTE: not resembling real data although same variable names
-source("R/dm03_sim_data.R") 
 # fbc <- df_all # If with other colnames
 fbc <- df_tot
 

@@ -1,10 +1,13 @@
+
+# Read previous scripts
+# source("R/dm01_utils.R")
+
 # Load packages
 
 # tidyverse for data management and visualization; cowplot for multipanel
 # plotting; mgcv for non-linear
 # modelling; lubridicate for working with dates
 
-source("R/dm01_utils.R")
 
 packages <- c(
   "tidyverse",
@@ -15,10 +18,14 @@ packages <- c(
   "survival",
   "mgcv",
   "lubridate",
+  "broom",
   "sf",
   "knitr",
   "gridExtra",
   "simstudy"
 )
 
-ipak(packages)
+suppressMessages(
+  ipak(packages)
+)
+
