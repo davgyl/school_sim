@@ -206,9 +206,9 @@ event_dg1 = rbinom(n, 1, prob_dg1)
 event_dg2 = rbinom(n, 1, prob_dg2)
 event_dg3 = rbinom(n, 1, prob_dg3)
 
-table(event_dg1)
-table(event_dg2)
-table(event_dg3)
+# table(event_dg1)
+# table(event_dg2)
+# table(event_dg3)
 
 df_tot <- 
   bind_cols(
@@ -217,6 +217,38 @@ df_tot <-
     event_dg2 = event_dg2,
     event_dg3 = event_dg3
   )
+
+# df_tot %>% count(event_dg1, event_dg2, event_dg3)
+
+df_tot <-
+  df_tot %>% 
+  mutate(
+    # full analysis sample diagnosis
+    fas_dg = case_when(
+      event_dg1 == 1 ~ "dg1",
+      event_dg2 == 1 ~ "dg2",
+      event_dg3 == 1 ~ "dg3",
+      T ~ "none"
+    ), 
+    # Hierarchical events
+    event_dg1 = case_when(
+      fas_dg == "dg1" ~ 1, 
+      fas_dg == "none" ~ 0,
+      T ~ NA_real_
+    ), 
+    event_dg2 = case_when(
+      fas_dg == "dg2" ~ 1, 
+      fas_dg == "none" ~ 0,
+      T ~ NA_real_
+    ), 
+    event_dg3 = case_when(
+      fas_dg == "dg3" ~ 1, 
+      fas_dg == "none" ~ 0,
+      T ~ NA_real_
+    )
+  ) 
+
+# df_tot %>% count(event_dg1, event_dg2, event_dg3)
 
 df_tot <-
   df_tot %>%
