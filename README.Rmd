@@ -1,5 +1,5 @@
 ---
-title: "Simulating data and analysing associations between school performance and psychiatric disorders"
+title: "Simulating data and analysing associations between school performance and psychiatric diagnoses"
 output: rmarkdown::github_document
 ---
 
@@ -22,12 +22,11 @@ Clone the repository from <https://github.com/davgyl/school_sim.git> and load th
 source("R/dm01_utils.R")
 source("R/dm02_pkg.r")
 source("R/dm03_sim_data.R")
-fbc <- df_tot
 # Show simulated data
-fbc
+df_tot
 ```
 
-## Descriptive analyses
+Descriptive analyses of simulated data
 
 ```{r chunk_02}
 
@@ -39,26 +38,23 @@ summary_age
 
 ## Modelling and visualization
 
-To model the associations, run ´R/mv03_fit_modelst.r´. 
-To model the associations, run ´R/mv03_fit_modelst.r´. 
-To model the associations, run ´R/mv03_fit_modelst.r´. 
+To model the associations, run `R/mv03_fit_models.r`. 
+To visualize the associations, run `R/mv04_viz.r`. 
+To further edit tables and figres, run `R/mv05_tabs_xtra_viz.r`. 
 
-## Version of packages
+## Versions
 
-```{r chunk_03, echo=TRUE}
+R version: `r getRversion()`. Version of packages are shown in the table below. 
 
-packageVersion("tidyverse")
-packageVersion("openxlsx")
-packageVersion("modelr")
-packageVersion("cowplot")
-packageVersion("GGally")
-packageVersion("survival")
-packageVersion("mgcv")
-packageVersion("lubridate")
-packageVersion("broom")
-packageVersion("sf")
-packageVersion("knitr")
-packageVersion("gridExtra")
-packageVersion("simstudy")
+```{r chunk_03, echo=FALSE}
+
+tab_pkg_vs <- matrix(NA, nrow = length(packages), ncol = 2)
+
+for(i in 1:length(packages)) {
+  tab_pkg_vs[i, 1] <- packages[[i]]
+  tab_pkg_vs[i, 2] <- packageVersion(packages[[i]]) %>% paste()
+}
+
+kable(tab_pkg_vs, col.names = c("Package", "Version"))
 
 ```

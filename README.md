@@ -1,5 +1,5 @@
 Simulating data and analysing associations between school performance
-and psychiatric disorders
+and psychiatric diagnoses
 ================
 
 ## Introduction
@@ -20,9 +20,8 @@ load the functions from the R-scripts.
 source("R/dm01_utils.R")
 source("R/dm02_pkg.r")
 source("R/dm03_sim_data.R")
-fbc <- df_tot
 # Show simulated data
-fbc
+df_tot
 ```
 
     ## # A tibble: 60,000 x 24
@@ -40,11 +39,11 @@ fbc
     ## 10 1.00e6 2003-05-31    8.17       0       0       0       0       1       0
     ## # … with 59,990 more rows, and 15 more variables: subject_1 <dbl>,
     ## #   subject_2 <dbl>, subject_3 <dbl>, subject_4 <dbl>, subject_5 <dbl>,
-    ## #   subject_6 <dbl>, event_dg1 <int>, event_dg2 <int>, event_dg3 <int>,
-    ## #   time_dg1 <date>, time_dg2 <date>, time_dg3 <date>, fas_dg <chr>,
+    ## #   subject_6 <dbl>, event_dg1 <dbl>, event_dg2 <dbl>, event_dg3 <dbl>,
+    ## #   fas_dg <chr>, time_dg1 <date>, time_dg2 <date>, time_dg3 <date>,
     ## #   dob <date>, fas <dbl>
 
-## Descriptive analyses
+Descriptive analyses of simulated data
 
 ``` r
 source("R/mv01_descr_time_event.r")
@@ -54,17 +53,17 @@ table_1_data %>% select(-km_fit)
     ## # A tibble: 258 x 10
     ## # Groups:   outcome, chracteristic [63]
     ##    outcome chracteristic value     n n_risk pyears events ci_estimate
-    ##    <chr>   <chr>         <chr> <int>  <int>  <dbl>  <int>       <dbl>
-    ##  1 dg1     all           all   60000  60000 7.16e5    796       4.45 
-    ##  2 dg2     all           all   60000  60000 7.17e5    478       1.00 
-    ##  3 dg3     all           all   60000  60000 7.04e5   2898       6.56 
-    ##  4 dg1     covar_1       0     58173  58173 6.94e5    769       4.72 
-    ##  5 dg1     covar_1       1      1827   1827 2.18e4     27       1.73 
-    ##  6 dg2     covar_1       0     58173  58173 6.96e5    450       0.976
-    ##  7 dg2     covar_1       1      1827   1827 2.18e4     28       1.93 
-    ##  8 dg3     covar_1       0     58173  58173 6.82e5   2785       6.56 
-    ##  9 dg3     covar_1       1      1827   1827 2.13e4    113       6.52 
-    ## 10 dg1     covar_2       0     53145  53145 6.35e5    580       5.16 
+    ##    <chr>   <chr>         <chr> <int>  <int>  <dbl>  <dbl>       <dbl>
+    ##  1 dg1     all           all   60000  56733 6.76e5    796        4.90
+    ##  2 dg2     all           all   60000  56407 6.74e5    470        1.05
+    ##  3 dg3     all           all   60000  58734 6.89e5   2797        6.51
+    ##  4 dg1     covar_1       0     58173  55041 6.56e5    769        5.16
+    ##  5 dg1     covar_1       1      1827   1692 2.02e4     27        1.87
+    ##  6 dg2     covar_1       0     58173  54714 6.54e5    442        1.02
+    ##  7 dg2     covar_1       1      1827   1693 2.02e4     28        2.08
+    ##  8 dg3     covar_1       0     58173  56962 6.68e5   2690        6.52
+    ##  9 dg3     covar_1       1      1827   1772 2.06e4    107        6.24
+    ## 10 dg1     covar_2       0     53145  50249 6.00e5    580        5.63
     ## # … with 248 more rows, and 2 more variables: ci_conf.high <dbl>,
     ## #   ci_conf.low <dbl>
 
@@ -75,94 +74,34 @@ summary_age
     ## # A tibble: 5 x 4
     ##   time_dg1 time_dg2 time_dg3 measure
     ##      <dbl>    <dbl>    <dbl> <chr>  
-    ## 1    26.8     27.2     23.8  mean   
-    ## 2     2.77     2.29     3.99 sd     
+    ## 1    22.2     22.1     22.2  mean   
+    ## 2     3.56     3.70     3.59 sd     
     ## 3    15.5     15.5     15.6  min    
-    ## 4    27.8     27.9     24.6  median 
-    ## 5    28.9     28.9     28.9  max
+    ## 4    22.3     22.2     22.1  median 
+    ## 5    28.6     28.7     28.8  max
 
 ## Modelling and visualization
 
-To model the associations, run ´R/mv03\_fit\_modelst.r´. To model the
-associations, run ´R/mv03\_fit\_modelst.r´. To model the associations,
-run ´R/mv03\_fit\_modelst.r´.
+To model the associations, run `R/mv03_fit_models.r`. To visualize the
+associations, run `R/mv04_viz.r`. To further edit tables and figres, run
+`R/mv05_tabs_xtra_viz.r`.
 
-## Version of packages
+## Versions
 
-``` r
-packageVersion("tidyverse")
-```
+R version: 3.6.3. Version of packages are shown in the table below.
 
-    ## [1] '1.3.0'
-
-``` r
-packageVersion("openxlsx")
-```
-
-    ## [1] '4.1.4'
-
-``` r
-packageVersion("modelr")
-```
-
-    ## [1] '0.1.6'
-
-``` r
-packageVersion("cowplot")
-```
-
-    ## [1] '1.0.0'
-
-``` r
-packageVersion("GGally")
-```
-
-    ## [1] '1.5.0'
-
-``` r
-packageVersion("survival")
-```
-
-    ## [1] '3.1.8'
-
-``` r
-packageVersion("mgcv")
-```
-
-    ## [1] '1.8.31'
-
-``` r
-packageVersion("lubridate")
-```
-
-    ## [1] '1.7.4'
-
-``` r
-packageVersion("broom")
-```
-
-    ## [1] '0.5.5'
-
-``` r
-packageVersion("sf")
-```
-
-    ## [1] '0.8.1'
-
-``` r
-packageVersion("knitr")
-```
-
-    ## [1] '1.28'
-
-``` r
-packageVersion("gridExtra")
-```
-
-    ## [1] '2.3'
-
-``` r
-packageVersion("simstudy")
-```
-
-    ## [1] '0.1.15'
+| Package   | Version |
+| :-------- | :------ |
+| tidyverse | 1.3.0   |
+| openxlsx  | 4.1.4   |
+| modelr    | 0.1.6   |
+| cowplot   | 1.0.0   |
+| GGally    | 1.5.0   |
+| survival  | 3.1.8   |
+| mgcv      | 1.8.31  |
+| lubridate | 1.7.4   |
+| broom     | 0.5.5   |
+| sf        | 0.8.1   |
+| knitr     | 1.28    |
+| gridExtra | 2.3     |
+| simstudy  | 0.1.15  |
