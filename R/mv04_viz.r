@@ -741,3 +741,142 @@ cowplot::plot_grid(
 #     ".pdf"
 #   )
 #   , h = 11, w = 11*1.6, s = 1)
+
+
+# Summarize all multivariate models in figure -----------------------------
+
+
+model_contrasts %>% count(grades_label)
+
+model_contrasts %>%
+  summarise(
+    min(estimate),
+    max(estimate)
+  )
+
+model_contrasts %>%
+  summarise(
+    min(z_score),
+    max(z_score)
+  )
+
+model_contrasts %>%
+  filter(z_score >= -2, z_score <= 2) %>%
+  summarise(
+    min(estimate),
+    max(estimate)
+  )
+
+# Dataframe for plotting estimates with different alpha depedning whether CI includes 1
+
+model_contrasts %>% count(outcome_label, grades_label)
+
+model_contrasts_sign <-
+  model_contrasts %>%
+  filter(adjustment == "Multivariate with covariates and other grades") %>%
+  mutate(
+    estimate.sign = case_when(
+      conf.sign == 1 ~ estimate,
+      T ~ NA_real_
+    ),
+    estimate.sign.nocorr = case_when(
+      conf.sign.nocorr == 1 ~ estimate,
+      T ~ NA_real_
+    ),
+    estimate.psy = case_when(
+      outcome_label == "Non-affective psychosis" ~ estimate,
+      T ~ NA_real_
+    ),
+    estimate.sign.nocorr.psy = case_when(
+      outcome_label == "Non-affective psychosis" ~ estimate.sign.nocorr,
+      T ~ NA_real_
+    ),
+    estimate.sign.psy = case_when(
+      outcome_label  == "Non-affective psychosis" ~ estimate.sign,
+      T ~ NA_real_
+    )
+  ) %>%
+  select(contains("utco"), contains("grad"), contains("estim"), z_score)
+
+model_contrasts_average_sign <-
+  model_contrasts %>%
+  filter(grades_label == "Average") %>%
+  filter(adjustment == "Multivariate with covariates") %>%
+  mutate(
+    estimate.sign = case_when(
+      conf.sign == 1 ~ estimate,
+      T ~ NA_real_
+    ),
+    estimate.sign.nocorr = case_when(
+      conf.sign.nocorr == 1 ~ estimate,
+      T ~ NA_real_
+    ),
+    estimate.psy = case_when(
+      outcome_label == "Non-affective psychosis" ~ estimate,
+      T ~ NA_real_
+    ),
+    estimate.sign.nocorr.psy = case_when(
+      outcome_label == "Non-affective psychosis" ~ estimate.sign.nocorr,
+      T ~ NA_real_
+    ),
+    estimate.sign.psy = case_when(
+      outcome_label  == "Non-affective psychosis" ~ estimate.sign,
+      T ~ NA_real_
+    )
+  ) %>%
+  select(contains("utco"), contains("grad"), contains("estim"), z_score)
+
+plot_sign <-
+  model_contrasts_sign %>%
+  filter(grades_label != "Average") %>%
+  # filter(outcome != "bipo") %>%
+  ggplot(aes(z_score, estimate, color = outcome_label)) +
+  facet_wrap(. ~ grades_label, nrow = 2) +
+  scale_y_log10(breaks = c(.25, .5, 1, 2, 4), limits = c(0.435, 2.35)) +
+  scale_x_continuous(
+    breaks = seq(-2, 2, by = 0.5),
+    # label = c(),
+    limits = c(-2, 2)
+  ) +
+  labs(y = "RR", x = "Z-score", color = "Outome") +
+  geom_hline(yintercept = 1, colour = "grey80", linetype = 2) +
+  geom_line(aes(colour = outcome_label), size = 1.5, alpha = 0.5, linetype = 3) +
+  # geom_line(aes(x = z_score, y = estimate.sign.nocorr, colour = outcome_label), size = 2, alpha = 1) +
+  geom_line(aes(x = z_score, y = estimate.sign, colour = outcome_label), size = 1.5, alpha = 1) +
+  geom_line(aes(x = z_score, y = estimate.psy, colour = outcome_label), alpha = 0.5, linetype = 3, size = 1.5) +
+  geom_line(aes(x = z_score, y = estimate.sign.psy, colour = outcome_label), size = 1.5, alpha = 1) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    # legend.position = "none"
+  )
+
+
+
+plot_sign
+
+plot_av_sign <-
+  plot_sign %+%
+  list(data = model_contrasts_average_sign %>%
+         filter(grades_label == "Average")
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+
+plot_av_sign
+
+cowplot::plot_grid(
+  plot_av_sign, plot_sign,
+  rel_widths = c(1, 1.35),
+  labels = "AUTO")
+
+# ggsave(
+#   paste0(
+#     "FOR_MS_multivariate_",
+#     Sys.Date(),
+#     ".pdf"
+#     # ".tiff"
+#   )
+#   , h = 5, w = 11, s = 1.2)
