@@ -7,9 +7,10 @@ output: rmarkdown::github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+[![DOI](https://zenodo.org/badge/519967868.svg)](https://zenodo.org/badge/latestdoi/519967868)
 
 ## Introduction
-This document shows how to simulate data, perform the analyses and vizualize the results as described in the manuscript 'School Performance and Later Diagnoses of Non-Affective Psychoses, Bipolar Disorder and Depression'.  
+This document shows how to simulate data, perform the analyses and vizualize the results as described in the article 'School Performance and Later Diagnoses of Non-Affective Psychoses, Bipolar Disorder, and Depression' published in Acta Psychiatrica Scandinavica (DOI:10.1111/acps.13481): <http://doi.org/10.1111/acps.13481>.  
 
 ## Load functions
 
