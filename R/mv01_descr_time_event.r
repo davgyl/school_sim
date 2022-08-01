@@ -1,4 +1,5 @@
 # Read previous scripts
+# source("R/dm01_utils.R")
 # source("R/dm02_pkg.r")
 
 # If simulated data
@@ -123,12 +124,13 @@ cumulative_incidence <- function(x, at = Inf) {
     mutate_all(~ (1 - .) * 100)
 }
 
+options(dplyr.summarise.inform = FALSE)
 
 table_1_data <-
   map_df(strata, ~ {
   fbc_long %>%
     group_by(outcome, chracteristic = .x, value = !!sym(.x)) %>%
-    summarize(
+    summarise(
       n = n(),
       n_risk = sum(time > 0, na.rm = T),
       pyears = sum(time, na.rm = T),
