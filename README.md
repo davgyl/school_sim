@@ -46,36 +46,10 @@ df_tot
     ## #   fas_dg <chr>, time_dg1 <date>, time_dg2 <date>, time_dg3 <date>,
     ## #   dob <date>, fas <dbl>
 
-Descriptive analyses of simulated
-    data
+Descriptive analyses of simulated data
 
 ``` r
 source("R/mv01_descr_time_event.r")
-```
-
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-    ## `summarise()` has grouped output by 'outcome', 'chracteristic'. You can override using the `.groups` argument.
-
-``` r
 table_1_data %>% select(-km_fit)
 ```
 
